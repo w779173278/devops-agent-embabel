@@ -1,0 +1,22 @@
+diagnostics:
+  rules:
+    - id: checkout-error-spike
+      description: "Checkout HTTP 5xx rate is elevated"
+      severity: HIGH
+      metric: http_error_rate
+      threshold: 2.0
+      keywords:
+        - checkout
+        - "HTTP 5xx"
+      suggested-actions:
+        - restart-checkout
+        - rollback-checkout
+    - id: latency-regression
+      description: "Checkout latency regressed beyond SLO"
+      severity: MEDIUM
+      metric: latency_p95
+      threshold: 400.0
+      keywords:
+        - timeout
+      suggested-actions:
+        - restart-checkout

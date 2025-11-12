@@ -1,0 +1,19 @@
+actions:
+  definitions:
+    - id: restart-checkout
+      description: "Restart checkout deployment rolling pods"
+      command-template: "kubectl rollout restart deployment/checkout"
+      confirmation-phrase: "CONFIRM_RESTART_CHECKOUT"
+      rule-ids:
+        - checkout-error-spike
+        - latency-regression
+      rollback-command: "kubectl rollout undo deployment/checkout"
+      dry-run-supported: true
+    - id: rollback-checkout
+      description: "Roll back checkout deployment to previous revision"
+      command-template: "kubectl rollout undo deployment/checkout --to-revision=previous"
+      confirmation-phrase: "CONFIRM_ROLLBACK_CHECKOUT"
+      rule-ids:
+        - checkout-error-spike
+      rollback-command: "kubectl rollout undo deployment/checkout --to-revision=previous"
+      dry-run-supported: false
