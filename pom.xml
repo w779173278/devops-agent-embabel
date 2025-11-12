@@ -23,6 +23,8 @@
         <module>examples-kotlin</module>
         <module>examples-java</module>
         <module>examples-common</module>
+        <module>embabel-agent-spring-boot-starter</module>
+        <module>devops-agent</module>
     </modules>
 
 

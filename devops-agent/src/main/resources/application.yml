@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: devops-agent
+  config:
+    import: "classpath:diagnostics.yml,classpath:actions.yml"
+
+logging:
+  level:
+    com.embabel.devops: INFO
+
+embabel:
+  shell:
+    history: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+devops:
+  organization: embabel
+  conversation-ttl-minutes: 120
+  workflow:
+    default-environment: prod
+    progress-notifications: true
+  safety:
+    require-approval: true
+    confirmation-window-minutes: 15
+    escalation-channel: "#devops-security"
+  data-sources:
+    - id: checkout-logs
+      type: LOGS
+      endpoint: "mcp://logs/checkout"
+      environment: prod
+      description: "Structured logs for checkout service"
+    - id: checkout-metrics
+      type: METRICS
+      endpoint: "mcp://metrics/checkout"
+      environment: prod
+      description: "Prometheus metrics for checkout service"
