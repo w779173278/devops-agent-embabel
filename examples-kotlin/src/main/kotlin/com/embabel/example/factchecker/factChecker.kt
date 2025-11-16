@@ -92,7 +92,7 @@ class FactCheckerAgentConfiguration {
 
 
 /**
- * Naming agent that generates names for a company or project.
+ * 用于校验内容事实准确性的 Agent。
  */
 fun factCheckerAgent(
     llms: List<LlmOptions>,

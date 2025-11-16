@@ -1,7 +1,8 @@
+# actions.yml：定义可执行的修复动作目录
 actions:
   definitions:
     - id: restart-checkout
-      description: "Restart checkout deployment rolling pods"
+      description: "滚动重启 checkout 部署"
       command-template: "kubectl rollout restart deployment/checkout"
       confirmation-phrase: "CONFIRM_RESTART_CHECKOUT"
       rule-ids:
@@ -10,7 +11,7 @@ actions:
       rollback-command: "kubectl rollout undo deployment/checkout"
       dry-run-supported: true
     - id: rollback-checkout
-      description: "Roll back checkout deployment to previous revision"
+      description: "将 checkout 部署回滚到上一版本"
       command-template: "kubectl rollout undo deployment/checkout --to-revision=previous"
       confirmation-phrase: "CONFIRM_ROLLBACK_CHECKOUT"
       rule-ids:

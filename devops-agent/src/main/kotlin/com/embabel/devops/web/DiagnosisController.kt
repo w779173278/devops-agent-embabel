@@ -1,10 +1,11 @@
 package com.embabel.devops.web
 
+import com.embabel.devops.agent.DiagnosisWorkflow
+import com.embabel.devops.agent.DiagnosisWorkflowResult
 import com.embabel.devops.config.DiagnosticsCatalogProperties
-import com.embabel.devops.service.DiagnosisRequest
-import com.embabel.devops.service.DiagnosisRepository
-import com.embabel.devops.service.DiagnosisWorkflow
-import com.embabel.devops.service.DiagnosisWorkflowResult
+import com.embabel.devops.model.DiagnosisIssue
+import com.embabel.devops.model.DiagnosisRepository
+import com.embabel.devops.model.DiagnosisRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
@@ -35,7 +36,7 @@ class DiagnosisController(
     @GetMapping("/{id}")
     fun findDiagnosis(@PathVariable id: String): DiagnosisResponse {
         val diagnosis = repository.findById(id) ?: throw DiagnosisNotFoundException(id)
-        val summary = "Diagnosis ${diagnosis.id} for ${diagnosis.request.service}"
+        val summary = "诊断 ${diagnosis.id}（服务：${diagnosis.request.service}）"
         return DiagnosisResponse(
             diagnosisId = diagnosis.id,
             service = diagnosis.request.service,
@@ -96,7 +97,7 @@ data class DiagnosisIssueResponse(
     val evidence: List<String>,
 )
 
-private fun com.embabel.devops.service.DiagnosisIssue.toResponse() = DiagnosisIssueResponse(
+private fun DiagnosisIssue.toResponse() = DiagnosisIssueResponse(
     ruleId = ruleId,
     severity = severity,
     summary = summary,
@@ -104,4 +105,4 @@ private fun com.embabel.devops.service.DiagnosisIssue.toResponse() = DiagnosisIs
 )
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-class DiagnosisNotFoundException(id: String) : RuntimeException("Diagnosis $id not found")
+class DiagnosisNotFoundException(id: String) : RuntimeException("找不到编号为 $id 的诊断记录")

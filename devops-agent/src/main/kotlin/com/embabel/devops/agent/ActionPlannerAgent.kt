@@ -3,25 +3,26 @@ package com.embabel.devops.agent
 import com.embabel.agent.api.annotation.Action
 import com.embabel.agent.api.annotation.Agent
 import com.embabel.agent.api.annotation.AchievesGoal
-import com.embabel.agent.api.annotation.Input
-import com.embabel.devops.service.ActionExecutorTool
-import com.embabel.devops.service.ActionPlan
-import com.embabel.devops.service.ActionStep
-import com.embabel.devops.service.ConversationMemoryService
-import com.embabel.devops.service.DiagnosisResult
-import com.embabel.devops.service.ExecutionRecord
-import com.embabel.devops.service.ExecutionRecordRepository
-import com.embabel.devops.service.RemediationDecision
-import com.embabel.devops.service.RemediationPlannerTool
-import com.embabel.devops.service.RemediationRequest
-import com.embabel.devops.service.RollbackTool
+import com.embabel.devops.model.ActionPlan
+import com.embabel.devops.model.ActionStep
+import com.embabel.devops.model.DiagnosisResult
+import com.embabel.devops.model.ExecutionRecord
+import com.embabel.devops.model.ExecutionRecordRepository
+import com.embabel.devops.model.RemediationDecision
+import com.embabel.devops.model.RemediationRequest
+import com.embabel.devops.tool.ActionExecutorTool
+import com.embabel.devops.tool.RemediationPlannerTool
+import com.embabel.devops.tool.RollbackTool
 import org.springframework.stereotype.Component
 
 @Agent(
     name = "actionPlannerAgent",
-    description = "Plan and execute remediation workflows",
+    description = "规划并执行修复流程的多工具 Agent",
 )
 @Component
+/**
+ * 行动规划 Agent：根据诊断结果生成修复计划、请求人工确认并执行命令。
+ */
 class ActionPlannerAgent(
     private val plannerTool: RemediationPlannerTool,
     private val executorTool: ActionExecutorTool,
@@ -33,8 +34,11 @@ class ActionPlannerAgent(
     fun proposePlan(diagnosisResult: DiagnosisResult): ActionPlan = plannerTool.plan(diagnosisResult)
 
     @Action(outputBinding = "remediationDecision")
+    /**
+     * 通过执行一次 dry-run 来验证指定的修复步骤，确保人类确认后再执行。
+     */
     fun confirmPlan(
-        @Input("remediationPlan") plan: ActionPlan,
+        plan: ActionPlan,
         request: RemediationRequest,
     ): RemediationDecision {
         val step = findRequestedStep(plan, request.requestedActionId)
@@ -45,18 +49,18 @@ class ActionPlannerAgent(
         )
         return RemediationDecision(
             approved = true,
-            reason = "Dry run ${preview.executionId} complete for ${step.actionId}",
+            reason = "干跑 ${preview.executionId} 已完成，目标动作 ${step.actionId}",
         )
     }
 
-    @AchievesGoal("Execute the approved remediation plan")
+    @AchievesGoal(description = "执行已确认的修复计划")
     @Action
     fun executePlan(
-        @Input("remediationPlan") plan: ActionPlan,
-        @Input("remediationDecision") decision: RemediationDecision,
+       plan: ActionPlan,
+       decision: RemediationDecision,
         request: RemediationRequest,
     ): ExecutionRecord {
-        require(decision.approved) { "Remediation request not approved" }
+        require(decision.approved) { "修复请求尚未获批" }
         val step = findRequestedStep(plan, request.requestedActionId)
         val record = executorTool.execute(plan.diagnosisId, step, request)
         executionRecordRepository.save(record)
@@ -68,11 +72,11 @@ class ActionPlannerAgent(
         plan: ActionPlan,
         reason: String,
     ): ExecutionRecord {
-        val step = plan.steps.firstOrNull() ?: error("No steps to rollback")
+        val step = plan.steps.firstOrNull() ?: error("计划 ${plan.planId} 中没有可回滚的步骤")
         return rollbackTool.rollback(plan.diagnosisId, step, reason)
     }
 
     private fun findRequestedStep(plan: ActionPlan, actionId: String): ActionStep =
         plan.steps.firstOrNull { it.actionId == actionId }
-            ?: error("Action $actionId not found in plan ${plan.planId}")
+            ?: error("在计划 ${plan.planId} 中找不到动作 $actionId")
 }

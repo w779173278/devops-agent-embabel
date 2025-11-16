@@ -1,9 +1,12 @@
-package com.embabel.devops.service
+package com.embabel.devops.model
 
 import com.embabel.devops.config.DiagnosticsCatalogProperties
 import org.springframework.stereotype.Service
 
 @Service
+/**
+ * 规则引擎：基于阈值 + 关键字在日志/指标中找出异常，并生成证据。
+ */
 class DiagnosisService(
     private val catalog: DiagnosticsCatalogProperties,
 ) {

@@ -1,8 +1,7 @@
 package com.embabel.devops.agent
 
 import com.embabel.devops.DevOpsAgentTestConfiguration
-import com.embabel.devops.service.ConversationMemoryService
-import com.embabel.devops.service.DiagnosisRequest
+import com.embabel.devops.model.DiagnosisRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

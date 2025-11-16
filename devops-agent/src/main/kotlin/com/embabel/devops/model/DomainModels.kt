@@ -1,10 +1,10 @@
-package com.embabel.devops.service
+package com.embabel.devops.model
 
 import com.embabel.devops.config.DiagnosticsCatalogProperties
 import java.time.Instant
 import java.util.UUID
 
-/** Request describing a diagnosis intent from chat/shell. */
+/** 描述一次来自会话/命令行的诊断请求。 */
 data class DiagnosisRequest(
     val conversationId: String,
     val service: String,
@@ -13,6 +13,7 @@ data class DiagnosisRequest(
     val symptom: String,
 )
 
+/** 对任意日志或指标数据的统一封装。 */
 data class Observation(
     val sourceId: String,
     val type: ObservationType,
@@ -36,6 +37,7 @@ data class DiagnosisIssue(
     val evidence: List<String>,
 )
 
+/** 诊断输出，包含命中的规则与建议动作。 */
 data class DiagnosisResult(
     val id: String = UUID.randomUUID().toString(),
     val request: DiagnosisRequest,
@@ -48,6 +50,7 @@ data class DiagnosisSummary(
     val content: String,
 )
 
+/** 针对诊断结果生成的一组修复步骤。 */
 data class ActionPlan(
     val planId: String = "plan-${UUID.randomUUID()}",
     val diagnosisId: String,
@@ -63,6 +66,7 @@ data class ActionStep(
     val rollbackCommand: String?,
 )
 
+/** 执行（或 dry-run）单个修复动作时的入参。 */
 data class RemediationRequest(
     val conversationId: String,
     val requestedActionId: String,

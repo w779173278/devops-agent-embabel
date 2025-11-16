@@ -61,7 +61,7 @@ class ResearcherProperties(
     personaVoice: String = "Your voice is dry and in the style of Sherlock Holmes. Occasionally you address the user as Watson",
     personaObjective: String = "To clarify all points the user has brought up",
 ) : PromptContributorConsumer {
-    // Create a Persona instance rather than extending it
+    // 直接创建 Persona 实例而非通过继承
     val persona = Persona(personaName, personaDescription, personaVoice, personaObjective)
 
     override val promptContributors: List<PromptContributor>
@@ -81,22 +81,22 @@ data class Categorization(
 )
 
 /**
- * Researcher agent that implements the Embabel model for autonomous research.
+ * Researcher Agent 基于 Embabel 模型执行自主调研。
  *
- * This agent demonstrates several key aspects of the Embabel framework:
- * 1. Multi-model approach - using both GPT-4 and Claude models for research
- * 2. Self-critique and improvement - evaluating reports and redoing research if needed
- * 3. Parallel execution - running multiple research actions concurrently
- * 4. Workflow control with conditions - using satisfactory/unsatisfactory conditions
- * 5. Model merging - combining results from different LLMs for better output
+ * 核心特性：
+ * 1. 多模型协作：并用 GPT-4 与 Claude 获取资料
+ * 2. 自我批判：对报告评分并按需重跑
+ * 3. 并行执行：多个调研动作同时运行
+ * 4. 条件控制：依赖“满意/不满意”条件推进流程
+ * 5. 模型融合：整合不同 LLM 的结果获得更优输出
  *
- * The agent follows a structured workflow:
- * - First categorizes user input as a question or discussion topic
- * - Performs research using multiple LLM models in parallel
- * - Merges the research reports from different models
- * - Self-critiques the merged report
- * - If unsatisfactory, reruns research with specific models
- * - Delivers the final research report when satisfactory
+ * 流程概述：
+ * - 先将输入分类为问题或讨论
+ * - 并行调用多种 LLM 开展调研
+ * - 合并不同模型的调研报告
+ * - 自我审查合并后的报告
+ * - 若不满意，针对特定模型重新调研
+ * - 最终在报告满意后交付结果
  */
 @Agent(
     description = "Perform deep web research on a topic",
@@ -112,11 +112,11 @@ class Researcher(
     }
 
     /**
-     * Categorizes the user input to determine the appropriate research approach.
-     * Uses the cheapest LLM model to efficiently classify the input.
+     * 为用户输入做分类以决定调研策略。
+     * 使用最便宜的 LLM 高效完成分类任务。
      *
-     * @param userInput The user's query or topic for research
-     * @return Categorization of the input as either a QUESTION or DISCUSSION
+     * @param userInput 用户的提问或话题
+     * @return 将输入标记为 QUESTION 或 DISCUSSION
      */
     @Action
     fun categorize(
@@ -134,15 +134,14 @@ class Researcher(
         )
 
     /**
-     * Performs research using the GPT-4 model.
-     * This is one of two parallel research paths (along with Claude).
+     * 使用 GPT-4 模型执行调研，是两条并行路径之一（另一条是 Claude）。
      *
-     * @param userInput The user's query or topic
-     * @param categorization The categorization of the input
-     * @param context The operation context for accessing tools and services
-     * @return A research report with the GPT-4 model's findings
+     * @param userInput 用户的提问或话题
+     * @param categorization 输入分类
+     * @param context 操作上下文，提供工具与服务
+     * @return GPT-4 模型生成的调研报告
      */
-    // These need a different output binding or only one will run
+    // 需要不同的 output binding，否则只会运行其中一个 Action
     @Action(
         post = [REPORT_SATISFACTORY],
         canRerun = true,
@@ -162,14 +161,13 @@ class Researcher(
     )
 
     /**
-     * Redoes research with GPT-4 after receiving an unsatisfactory critique.
-     * This demonstrates the agent's ability to improve based on feedback.
+     * 在收到“不满意”评价后，使用 GPT-4 重做调研，展示 Agent 的自我改进能力。
      *
-     * @param userInput The user's query or topic
-     * @param categorization The categorization of the input
-     * @param critique The critique of the previous report explaining why it was unsatisfactory
-     * @param context The operation context for accessing tools and services
-     * @return An improved research report with the GPT-4 model's findings
+     * @param userInput 用户提问或话题
+     * @param categorization 输入分类
+     * @param critique 之前报告的差评及原因
+     * @param context 操作上下文，提供工具与服务
+     * @return 改进后的 GPT-4 调研报告
      */
     @Action(
         pre = [REPORT_UNSATISFACTORY],
@@ -192,13 +190,12 @@ class Researcher(
     )
 
     /**
-     * Performs research using the Claude model.
-     * This is one of two parallel research paths (along with GPT-4).
+     * 使用 Claude 模型执行调研，与 GPT-4 路径并行。
      *
-     * @param userInput The user's query or topic
-     * @param categorization The categorization of the input
-     * @param context The operation context for accessing tools and services
-     * @return A research report with the Claude model's findings
+     * @param userInput 用户提问或话题
+     * @param categorization 输入分类
+     * @param context 操作上下文
+     * @return Claude 模型生成的调研报告
      */
     @Action(
         post = [REPORT_SATISFACTORY],
@@ -219,14 +216,13 @@ class Researcher(
     )
 
     /**
-     * Redoes research with Claude after receiving an unsatisfactory critique.
-     * This demonstrates the agent's ability to improve based on feedback.
+     * 在收到“不满意”评价后，使用 Claude 重新调研，体现基于反馈迭代的能力。
      *
-     * @param userInput The user's query or topic
-     * @param categorization The categorization of the input
-     * @param critique The critique of the previous report explaining why it was unsatisfactory
-     * @param context The operation context for accessing tools and services
-     * @return An improved research report with the Claude model's findings
+     * @param userInput 用户提问或话题
+     * @param categorization 输入分类
+     * @param critique 上一次报告被退回的原因
+     * @param context 操作上下文
+     * @return 改进后的 Claude 调研报告
      */
     @Action(
         pre = [REPORT_UNSATISFACTORY],
@@ -249,15 +245,14 @@ class Researcher(
     )
 
     /**
-     * Common implementation for research with different models.
-     * Routes to the appropriate research method based on categorization.
+     * 不同模型共享的调研实现，会根据分类路由到对应方法。
      *
-     * @param userInput The user's query or topic
-     * @param categorization The categorization of the input
-     * @param critique Optional critique from a previous attempt
-     * @param llm The LLM options including model selection
-     * @param context The operation context for accessing tools and services
-     * @return A research report with the specified model's findings
+     * @param userInput 用户提问或话题
+     * @param categorization 输入分类
+     * @param critique 可选的前次点评
+     * @param llm 目标 LLM 配置
+     * @param context 操作上下文
+     * @return 对应模型产出的调研报告
      */
     private fun researchWith(
         userInput: UserInput,
@@ -279,14 +274,13 @@ class Researcher(
     }
 
     /**
-     * Generates a research report that answers a specific question.
-     * Uses web tools to find precise answers with citations.
+     * 针对具体问题生成调研报告，利用 Web 工具找到具备引用的精准答案。
      *
-     * @param userInput The user's question
-     * @param llm The LLM options including model selection
-     * @param critique Optional critique from a previous attempt
-     * @param context The operation context for accessing tools and services
-     * @return A research report answering the question
+     * @param userInput 用户问题
+     * @param llm LLM 选型
+     * @param critique 可选的前次点评
+     * @param context 操作上下文
+     * @return 回答该问题的研究报告
      */
     private fun answerQuestion(
         userInput: UserInput,
@@ -321,14 +315,13 @@ class Researcher(
     )
 
     /**
-     * Generates a research report on a discussion topic.
-     * Uses web tools to gather information and provide a comprehensive overview.
+     * 针对讨论类话题生成调研报告，利用 Web 工具汇集信息并提供综述。
      *
-     * @param userInput The user's topic for research
-     * @param llm The LLM options including model selection
-     * @param critique Optional critique from a previous attempt
-     * @param context The operation context for accessing tools and services
-     * @return A research report on the topic
+     * @param userInput 用户指定的研究话题
+     * @param llm LLM 选型
+     * @param critique 可选的前次点评
+     * @param context 操作上下文
+     * @return 关于该话题的研究报告
      */
     private fun research(
         userInput: UserInput,
@@ -357,12 +350,11 @@ class Researcher(
     )
 
     /**
-     * Evaluates the quality of the merged research report.
-     * This implements the self-critique capability of the Embabel model.
+     * 评估合并后的调研报告质量，实现 Embabel 模型的自我批判能力。
      *
-     * @param userInput The user's original query or topic
-     * @param mergedReport The combined report to evaluate
-     * @return A critique with acceptance status and reasoning
+     * @param userInput 用户的原始提问或话题
+     * @param mergedReport 待评估的合并报告
+     * @return 包含接受状态与理由的评语
      */
     @Action(post = [REPORT_SATISFACTORY], canRerun = true)
     fun critiqueMergedReport(
@@ -383,13 +375,12 @@ class Researcher(
         )
 
     /**
-     * Combines the research reports from different models into a single, improved report.
-     * This demonstrates the multi-model approach of the Embabel framework.
+     * 将不同模型的调研报告合并为更优的一份，体现多模型协作能力。
      *
-     * @param userInput The user's original query or topic
-     * @param gpt4Report The research report from the GPT-4 model
-     * @param claudeReport The research report from the Claude model
-     * @return A merged research report combining the best insights from both models
+     * @param userInput 用户原始提问或话题
+     * @param gpt4Report GPT-4 产出的报告
+     * @param claudeReport Claude 产出的报告
+     * @return 融合两者优点的合并报告
      */
     @Action(
         post = [REPORT_SATISFACTORY],
@@ -420,11 +411,10 @@ class Researcher(
     }
 
     /**
-     * Condition that determines if a report is satisfactory.
-     * Used to control workflow progression.
+     * 判断报告是否“满意”的条件，用于推进工作流。
      *
-     * @param critique The critique of the report
-     * @return True if the report is accepted as satisfactory
+     * @param critique 报告对应的评价
+     * @return 满意则返回 true
      */
     @Condition(name = REPORT_SATISFACTORY)
     fun makesTheGrade(
@@ -432,31 +422,29 @@ class Researcher(
     ): Boolean = critique.accepted
 
     /**
-     * Condition that determines if a report is unsatisfactory.
-     * Used to trigger rework of research.
+     * 判断报告是否“不满意”的条件，用于触发调研返工。
      *
-     * @param critique The critique of the report
-     * @return True if the report is rejected as unsatisfactory
+     * @param critique 报告对应的评价
+     * @return 不满意则返回 true
      */
-    // TODO should be able to use !
+    // TODO 理论上这里应该能直接取反
     @Condition(name = REPORT_UNSATISFACTORY)
     fun rejected(
         critique: Critique,
     ): Boolean = !critique.accepted
 
     /**
-     * Final action that accepts the research report as the agent's output.
-     * This marks the successful completion of the research task.
+     * 最终动作：接受调研报告并作为 Agent 输出，标志任务完成。
      *
-     * @param mergedReport The final merged research report
-     * @param critique The positive critique confirming the report is satisfactory
-     * @return The final research report
+     * @param mergedReport 最终合并的研究报告
+     * @param critique 确认满意的评语
+     * @return 最终调研报告
      */
     @AchievesGoal(
         description = "Completes a research or question answering task, producing a research report",
     )
-    // TODO this won't complete without the output binding to a new thing.
-    // This makes some sense but seems a bit surprising
+    // TODO 若 output binding 未绑定到新对象则无法完成
+    // 虽然说得通，但依然有点出乎意料
     @Action(pre = [REPORT_SATISFACTORY], outputBinding = "finalResearchReport")
     fun acceptReport(
         @RequireNameMatch mergedReport: ResearchReport,
@@ -464,10 +452,10 @@ class Researcher(
     ) = mergedReport
 
     companion object {
-        /** Condition name for when a report is satisfactory */
+        /** 表示“报告满意”状态的条件常量 */
         const val REPORT_SATISFACTORY = "reportSatisfactory"
 
-        /** Condition name for when a report is unsatisfactory */
+        /** 表示“报告不满意”状态的条件常量 */
         const val REPORT_UNSATISFACTORY = "reportUnsatisfactory"
     }
 }

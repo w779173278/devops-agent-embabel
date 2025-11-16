@@ -1,4 +1,4 @@
-package com.embabel.devops.service
+package com.embabel.devops.model
 
 import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Service

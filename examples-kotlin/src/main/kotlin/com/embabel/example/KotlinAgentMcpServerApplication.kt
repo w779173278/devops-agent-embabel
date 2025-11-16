@@ -22,12 +22,10 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 
 /**
- * Spring Boot application that runs Embabel agents as an MCP (Model Context Protocol) server.
+ * 将 Embabel Agent 作为 MCP（Model Context Protocol）服务器运行的 Spring Boot 应用。
  *
- * This application exposes agents as MCP-compatible tools that can be consumed by
- * AI assistants like Claude Desktop, IDEs, or other MCP clients. The server
- * implements the JSON-RPC based MCP protocol for tool discovery and execution.
- *
+ * 该应用把 Agent 暴露为兼容 MCP 的工具，供 Claude Desktop、IDE 等客户端调用，
+ * 并通过 JSON-RPC 协议实现工具发现与执行。
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan(
@@ -39,12 +37,11 @@ import org.springframework.boot.runApplication
 class KotlinAgentMcpServerApplication
 
 /**
- * Application entry point that starts the MCP server.
+ * 应用入口，用于启动 MCP 服务器。
  *
- * Initializes Spring Boot with MCP server configuration and begins
- * listening for JSON-RPC requests from MCP clients.
+ * 通过 MCP 相关配置启动 Spring Boot，并开始监听来自 MCP 客户端的 JSON-RPC 请求。
  *
- * @param args Command line arguments passed to the application
+ * @param args 传递给应用的命令行参数
  */
 fun main(args: Array<String>) {
     runApplication<KotlinAgentMcpServerApplication>(*args)

@@ -1,23 +1,46 @@
+# Spring 基础配置，指定应用名、Reactive 模式以及默认模型
 spring:
   application:
     name: devops-agent
+  main:
+    web-application-type: reactive
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
+    chat:
+      client:
+        observations:
+          log-prompt: true
+      observations:
+        log-completion: true
+        log-prompt: true
   config:
     import: "classpath:diagnostics.yml,classpath:actions.yml"
 
+# 日志等级
 logging:
   level:
     com.embabel.devops: INFO
 
+# Embabel Shell/LLM 配置
 embabel:
+  models:
+    default-llm: deepseek-chat
   shell:
     history: true
 
+# 健康检查暴露
 management:
   endpoints:
     web:
       exposure:
         include: health,info
 
+# DevOps Agent 自定义配置：组织、会话 TTL、工作流、安全策略与数据源
 devops:
   organization: embabel
   conversation-ttl-minutes: 120
@@ -33,9 +56,9 @@ devops:
       type: LOGS
       endpoint: "mcp://logs/checkout"
       environment: prod
-      description: "Structured logs for checkout service"
+      description: "Checkout 服务结构化日志源"
     - id: checkout-metrics
       type: METRICS
       endpoint: "mcp://metrics/checkout"
       environment: prod
-      description: "Prometheus metrics for checkout service"
+      description: "Checkout 服务 Prometheus 指标"

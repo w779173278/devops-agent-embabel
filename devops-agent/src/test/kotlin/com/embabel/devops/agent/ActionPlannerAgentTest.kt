@@ -1,11 +1,11 @@
 package com.embabel.devops.agent
 
 import com.embabel.devops.DevOpsAgentTestConfiguration
-import com.embabel.devops.service.DiagnosisRequest
-import com.embabel.devops.service.DiagnosisResult
-import com.embabel.devops.service.DiagnosisIssue
-import com.embabel.devops.service.ExecutionRecord
-import com.embabel.devops.service.RemediationRequest
+import com.embabel.devops.model.DiagnosisIssue
+import com.embabel.devops.model.DiagnosisRequest
+import com.embabel.devops.model.DiagnosisResult
+import com.embabel.devops.model.ExecutionRecord
+import com.embabel.devops.model.RemediationRequest
 import com.embabel.devops.config.DiagnosticsCatalogProperties
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy

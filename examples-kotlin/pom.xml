@@ -19,7 +19,7 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Ollama is always included as an option for local model hosting -->
+        <!-- 始终加入 Ollama 以支持本地模型托管 -->
         <dependency>
             <groupId>com.embabel.agent</groupId>
             <artifactId>embabel-agent-starter-ollama</artifactId>

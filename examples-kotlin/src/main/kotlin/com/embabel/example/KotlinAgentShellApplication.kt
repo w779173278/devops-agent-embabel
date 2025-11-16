@@ -23,13 +23,12 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 
 /**
- * Spring Boot application that runs Embabel agents in interactive shell mode.
+ * 以交互式 Shell 方式运行 Embabel Agent 的 Spring Boot 应用。
  *
- * This application provides a command-line interface for testing and interacting
- * with agents. The shell allows executing agent commands, entering chat mode,
- * and debugging agent workflows.
+ * 该应用提供命令行界面，便于测试与调试 Agent：可以执行 Agent 命令、进入聊天模式，
+ * 以及排查工作流。
  *
- * ## Example Usage
+ * ## 使用示例
  * ```
  * shell:> execute "Find news for Alice who is a Gemini"
  * shell:> chat
@@ -49,12 +48,11 @@ import org.springframework.boot.runApplication
 class KotlinAgentShellApplication
 
 /**
- * Application entry point that bootstraps the Spring Boot application.
+ * 应用入口，负责启动 Spring Boot。
  *
- * Initializes the Spring context with agent auto-configuration and
- * starts the interactive shell interface.
+ * 初始化带有 Agent 自动配置的 Spring 上下文，并开启交互式 Shell 界面。
  *
- * @param args Command line arguments passed to the application
+ * @param args 传递给应用的命令行参数
  */
 fun main(args: Array<String>) {
     runApplication<KotlinAgentShellApplication>(*args)

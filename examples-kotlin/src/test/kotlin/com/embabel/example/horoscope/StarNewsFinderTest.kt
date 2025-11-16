@@ -36,7 +36,7 @@ class FakeHoroscopeService : HoroscopeService {
 
 
 /**
- * Demonstrates unit testing of an agent
+ * 演示如何为 Agent 编写单元测试
  */
 class StarNewsFinderTest {
 

@@ -1,7 +1,8 @@
+# diagnostics.yml：诊断规则/阈值配置
 diagnostics:
   rules:
     - id: checkout-error-spike
-      description: "Checkout HTTP 5xx rate is elevated"
+      description: "Checkout 服务 HTTP 5xx 错误率飙升"
       severity: HIGH
       metric: http_error_rate
       threshold: 2.0
@@ -12,7 +13,7 @@ diagnostics:
         - restart-checkout
         - rollback-checkout
     - id: latency-regression
-      description: "Checkout latency regressed beyond SLO"
+      description: "Checkout 服务延迟超出 SLO 目标"
       severity: MEDIUM
       metric: latency_p95
       threshold: 400.0

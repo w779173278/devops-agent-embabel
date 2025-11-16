@@ -1,4 +1,4 @@
-package com.embabel.devops.service
+package com.embabel.devops.tool
 
 import com.embabel.devops.config.DevOpsAgentProperties
 import java.time.Instant
@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Service
 
 @Service
+/** 确认口令窗口：确保危险命令只在有效期内执行。 */
 class RemediationConfirmationService(
     private val properties: DevOpsAgentProperties,
 ) {
@@ -25,7 +26,7 @@ class RemediationConfirmationService(
             Instant.now().minus(properties.safety.confirmationWindowMinutes, ChronoUnit.MINUTES)
         ) == true
         if (!withinWindow) {
-            error("Missing confirmation phrase for ${expected}")
+            error("缺少确认口令：${expected}")
         }
     }
 

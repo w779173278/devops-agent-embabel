@@ -1,11 +1,14 @@
-package com.embabel.devops.service
+package com.embabel.devops.tool
 
 import com.embabel.devops.config.DevOpsAgentProperties
+import com.embabel.devops.model.DiagnosisRequest
+import com.embabel.devops.model.Observation
 import java.time.Instant
 import kotlin.math.absoluteValue
 import org.springframework.stereotype.Service
 
 @Service
+/** 指标采集工具：构造指标观测值供规则匹配。 */
 class MetricsFetchTool(
     private val registry: DataSourceRegistry,
 ) {

@@ -33,8 +33,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import org.springframework.beans.factory.annotation.Value
 
 /**
- * Data class representing astrological details for a person.
- * Used to capture star sign information through a form interface.
+ * 表示某人星座信息的数据类。
+ * 通过表单交互采集星座字段。
  */
 @JsonClassDescription("Astrological details for a person")
 data class Starry(
@@ -43,9 +43,8 @@ data class Starry(
 )
 
 /**
- * Data class representing a person with their astrological details.
- * Implements the Person interface to maintain compatibility with the agent framework's
- * person-related operations.
+ * 表示同时包含基础资料与星座信息的人员数据类。
+ * 实现 Person 接口，以便在 Agent 框架中复用与人物相关的能力。
  */
 @JsonClassDescription("Person with astrology details")
 @JsonDeserialize(`as` = StarPerson::class)
@@ -56,34 +55,33 @@ data class StarPerson(
 ) : Person
 
 /**
- * Data class containing a person's horoscope summary.
- * Acts as a container for the horoscope text retrieved from the HoroscopeService.
+ * 保存某人星座运势摘要的数据类。
+ * 作为 HoroscopeService 返回文本的包装器。
  */
 data class Horoscope(
     val summary: String,
 )
 
 /**
- * Data class representing the final output of the agent's workflow.
- * Implements HasContent interface to provide standardized access to the text content.
+ * 表示 Agent 工作流最终输出的数据类。
+ * 实现 HasContent 接口，方便以统一方式读取文本内容。
  */
 data class Writeup(
     override val content: String,
 ) : HasContent
 
 /**
- * An agent that finds personalized news stories based on a person's star sign.
+ * 基于用户星座找到定制新闻的 Agent。
  *
- * This agent demonstrates the workflow of:
- * 1. Extracting person information from user input
- * 2. Obtaining astrological details
- * 3. Retrieving a horoscope
- * 4. Finding relevant news stories based on the horoscope
- * 5. Creating a personalized writeup combining the horoscope and news
+ * 工作流示例：
+ * 1. 从用户输入中抽取人物信息
+ * 2. 收集星座详情
+ * 3. 获取当日运势
+ * 4. 按运势查找相关新闻
+ * 5. 产出融合运势与新闻的个性化文案
  *
- * The agent leverages Spring dependency injection for services and uses
- * the annotation-driven programming model with @Agent and @Action annotations
- * to define its capabilities and workflow.
+ * Agent 依赖 Spring 的依赖注入提供服务，并通过 @Agent/@Action 等注解式编程
+ * 描述自身能力与流程。
  */
 @Agent(
     description = "Find news based on a person's star sign",
@@ -103,50 +101,46 @@ class StarNewsFinder(
 ) {
 
     /**
-     * Extracts a person entity from user input by parsing the text for a name.
+     * 通过解析文本从用户输入中抽取人物实体。
      *
-     * This method uses a lightweight LLM model (GPT-41-NANO) to efficiently extract
-     * just the person's name from the user's input text. It's an entry point for
-     * the agent workflow when only basic person information is available.
+     * 使用轻量 LLM（GPT-41-NANO）高效提取姓名，适合作为仅提供基础信息时的流程入口。
      *
-     * @param userInput The user's text input
-     * @return A Person object if extraction is successful, null otherwise
+     * @param userInput 用户的文本输入
+     * @return 抽取成功则返回 Person，否则为 null
      */
     @Action
     fun extractPerson(userInput: UserInput, context: OperationContext): Person? =
-        // All prompts are typesafe
+        // 所有提示词都是强类型的
         context.ai().withDefaultLlm().createObjectIfPossible(
             """
-            Create a person from this user input, extracting their name:
+            从此用户输入创建一个人员，提取其姓名：
             ${userInput.content}
             """.trimIndent()
         )
 
     /**
-     * Collects astrological details for a person through a form interface.
+     * 通过表单向用户收集星座信息。
      *
-     * This method is marked with a high cost (100.0) to indicate that it should
-     * only be used when no other path is available in the agent's planning process.
-     * The high cost discourages the agent from asking for user input unless necessary.
+     * 该方法被标记为高成本（100.0），提示规划过程中除非别无他法才调用，
+     * 以避免频繁向用户再次提问。
      *
-     * @param person The person for whom to collect star sign information
-     * @return A Starry object containing the person's star sign
+     * @param person 需要补充星座信息的人员
+     * @return 包含星座的 Starry 对象
      */
-    @Action(cost = 100.0) // Make it costly so it won't be used in a plan unless there's no other path
+    @Action(cost = 100.0) // 成本很高，除非没有其他路径，否则规划器不会选它
     internal fun makeStarry(
         person: Person,
     ): Starry =
-        fromForm("Let's get some astrological details for ${person.name}")
+        fromForm("让我们来了解一些占星学细节 ${person.name}")
 
     /**
-     * Combines a person and their astrological details into a StarPerson object.
+     * 将人员基础信息与星座详情组合成 StarPerson。
      *
-     * This method serves as a data transformation step in the agent workflow,
-     * creating a specialized person object that includes star sign information.
+     * 这是工作流中的数据转换步骤，用于生成包含星座的专用人物对象。
      *
-     * @param person The basic person information
-     * @param starry The astrological details
-     * @return A StarPerson object combining both sets of information
+     * @param person 基础人员信息
+     * @param starry 星座详情
+     * @return 组合后的 StarPerson
      */
     @Action
     fun assembleStarPerson(
@@ -160,50 +154,45 @@ class StarNewsFinder(
     }
 
     /**
-     * Extracts both person information and star sign directly from user input.
+     * 直接从用户输入中抽取姓名与星座。
      *
-     * This method provides an alternative entry point to the agent workflow,
-     * allowing the extraction of both name and star sign in a single step when
-     * that information is present in the user's input.
+     * 当文本中已包含相关信息时，可作为替代入口一步获得完整 StarPerson。
      *
-     * @param userInput The user's text input
-     * @return A StarPerson object if extraction is successful, null otherwise
+     * @param userInput 用户的文本输入
+     * @return 抽取成功则返回 StarPerson，否则为 null
      */
     @Action
     fun extractStarPerson(userInput: UserInput, context: OperationContext): StarPerson? =
         context.ai().withAutoLlm().createObjectIfPossible(
             """
-            Create a person from this user input, extracting their name and star sign:
+            从此用户输入创建人员，提取其姓名和星座:
             ${userInput.content}
             """.trimIndent()
         )
 
     /**
-     * Retrieves a daily horoscope for a person based on their star sign.
+     * 根据星座获取当日运势。
      *
-     * This method calls the injected HoroscopeService to get the actual horoscope text,
-     * wrapping it in a Horoscope data class for use in subsequent steps.
+     * 调用注入的 HoroscopeService 拉取原始文本，并封装为 Horoscope 供后续步骤使用。
      *
-     * @param starPerson The person with their star sign information
-     * @return A Horoscope object containing the daily horoscope text
+     * @param starPerson 含星座信息的人员
+     * @return 携带运势文本的 Horoscope
      */
     @Action
     fun retrieveHoroscope(starPerson: StarPerson) =
         Horoscope(horoscopeService.dailyHoroscope(starPerson.sign))
 
     /**
-     * Finds news stories relevant to a person's horoscope using web search tools.
+     * 使用网页工具，基于运势查找相关新闻。
      *
-     * This method requires web tools (specified by toolGroups) to search for and
-     * summarize news stories that relate to themes in the person's horoscope.
-     * It uses the LLM to interpret the horoscope, generate appropriate search
-     * queries, and summarize the results.
+     * 该方法要求具备 toolGroups 中声明的工具，以便搜索、概括与运势主题相关的新闻。
+     * LLM 会解读运势、生成搜索词并总结结果。
      *
-     * @param person The person with their star sign
-     * @param horoscope The person's daily horoscope
-     * @return A collection of relevant news stories with summaries and URLs
+     * @param person 含星座的人员
+     * @param horoscope 当日运势
+     * @return 带摘要与链接的相关新闻集合
      */
-    // toolGroups specifies tools that are required for this action to run
+    // toolGroups 指出运行此 Action 所需的工具
     @Action(toolGroups = [CoreToolGroups.WEB, CoreToolGroups.BROWSER_AUTOMATION])
     internal fun findNewsStories(
         person: StarPerson,
@@ -212,41 +201,38 @@ class StarNewsFinder(
     ): RelevantNewsStories =
         context.ai().withLlm(model).createObject(
             """
-            ${person.name} is an astrology believer with the sign ${person.sign}.
-            Their horoscope for today is:
+            ${person.name} 是一位占星术信徒，星座为 ${person.sign}。
+            他们今天的星座运势是：
                 <horoscope>${horoscope.summary}</horoscope>
-            Given this, use web tools and generate search queries
-            to find $storyCount relevant news stories summarize them in a few sentences.
-            Include the URL for each story.
-            Do not look for another horoscope reading or return results directly about astrology;
-            find stories relevant to the reading above.
+            鉴于此，请使用 Web 工具并生成搜索查询
+            要找到${storyCount}相关的新闻报道，请用几句话总结它们。
+            包括每个故事的 URL。
+            不要寻找另一个星座运势读数或直接返回有关占星术的结果;
+            查找与上述阅读相关的故事。
 
-            For example:
-            - If the horoscope says that they may
-            want to work on relationships, you could find news stories about
-            novel gifts
-            - If the horoscope says that they may want to work on their career,
-            find news stories about training courses.
+例如：
+            - 如果星座运势说他们可能
+            想要处理人际关系，你可以找到关于
+            新奇礼物
+            - 如果星座运势说他们可能想在自己的职业生涯上工作，
+            查找有关培训课程的新闻报道。
             """.trimIndent()
         )
 
     /**
-     * Creates a personalized writeup combining the horoscope and relevant news stories.
+     * 生成结合运势与相关新闻的个性化文案。
      *
-     * This method is the final step in the agent's workflow, marked with @AchievesGoal
-     * to indicate that it fulfills the agent's primary purpose. It uses the LLM with
-     * increased temperature (0.9) to generate creative content that combines the
-     * horoscope interpretation with the found news stories in an amusing way.
+     * 这是工作流的最后一步，并通过 @AchievesGoal 表明完成该 Action 即达成目标。
+     * 此处将 LLM 温度提升至 0.9，以更具创意、趣味的方式融合运势和新闻。
      *
-     * @param person The person with their star sign
-     * @param relevantNewsStories The collection of news stories found
-     * @param horoscope The person's daily horoscope
-     * @return A Writeup containing the formatted text combining horoscope and news
+     * @param person 含星座的人员
+     * @param relevantNewsStories 查到的相关新闻集合
+     * @param horoscope 当日运势
+     * @return 包含最终 Markdown 文案的 Writeup
      */
-    // The @AchievesGoal annotation indicates that completing this action
-    // achieves the given goal, so the agent flow can be complete
+    // @AchievesGoal 表示完成该 Action 即可满足目标，Agent 流程可以结束
     @AchievesGoal(
-        description = "Create an amusing writeup for the target person based on their horoscope",
+        description = "根据目标人的星座为他们写一篇有趣的文章",
         export = Export(
             remote = true,
             name = "StarNewsWriteup",

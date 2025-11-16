@@ -1,9 +1,10 @@
-package com.embabel.devops.service
+package com.embabel.devops.tool
 
 import com.embabel.devops.config.DevOpsAgentProperties
 import org.springframework.stereotype.Service
 
 @Service
+/** 简易数据源注册表，提供默认日志/指标源。 */
 class DataSourceRegistry(
     private val properties: DevOpsAgentProperties,
 ) {

@@ -1,10 +1,17 @@
-package com.embabel.devops.service
+package com.embabel.devops.agent
 
 import com.embabel.devops.agent.DiagnosisAgent
 import com.embabel.devops.config.DevOpsAgentProperties
+import com.embabel.devops.model.DiagnosisRequest
+import com.embabel.devops.model.DiagnosisResult
+import com.embabel.devops.model.DiagnosisSummary
+import com.embabel.devops.tool.DataSourceRegistry
 import org.springframework.stereotype.Service
 
 @Service
+/**
+ * 诊断编排：串联数据源、Agent 诊断与摘要，生成进度播报。
+ */
 class DiagnosisWorkflow(
     private val diagnosisAgent: DiagnosisAgent,
     private val dataSourceRegistry: DataSourceRegistry,

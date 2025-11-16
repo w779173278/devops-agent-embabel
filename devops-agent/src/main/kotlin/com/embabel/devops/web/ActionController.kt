@@ -1,8 +1,8 @@
 package com.embabel.devops.web
 
-import com.embabel.devops.service.ExecutionRecord
-import com.embabel.devops.service.RemediationCommandRequest
-import com.embabel.devops.service.RemediationWorkflow
+import com.embabel.devops.agent.RemediationCommandRequest
+import com.embabel.devops.agent.RemediationWorkflow
+import com.embabel.devops.model.ExecutionRecord
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus

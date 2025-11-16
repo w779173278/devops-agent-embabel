@@ -1,6 +1,8 @@
-package com.embabel.devops.service
+package com.embabel.devops.agent
 
 import com.embabel.devops.DevOpsAgentTestConfiguration
+import com.embabel.devops.model.DiagnosisRequest
+import com.embabel.devops.model.DiagnosisResult
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

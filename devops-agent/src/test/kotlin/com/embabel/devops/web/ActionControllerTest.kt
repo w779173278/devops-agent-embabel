@@ -1,8 +1,8 @@
 package com.embabel.devops.web
 
 import com.embabel.devops.DevOpsAgentTestConfiguration
-import com.embabel.devops.service.ExecutionRecord
-import com.embabel.devops.service.RemediationCommandRequest
+import com.embabel.devops.agent.RemediationCommandRequest
+import com.embabel.devops.model.ExecutionRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

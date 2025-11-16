@@ -1,11 +1,13 @@
-package com.embabel.devops.service
+package com.embabel.devops.agent
 
 import com.embabel.devops.config.DevOpsAgentProperties
+import com.embabel.devops.model.DiagnosisResult
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import org.springframework.stereotype.Service
 
 @Service
+/** 会话记忆：缓存最近的诊断/执行上下文，避免重复追问。 */
 class ConversationMemoryService(
     private val properties: DevOpsAgentProperties,
 ) {
